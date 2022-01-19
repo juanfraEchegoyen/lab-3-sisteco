@@ -61,10 +61,10 @@ def funcion(subLlave, bloque):
     return resultado
 
 
-llave = "hola"      # Llave principal
+llave = "hol"      # Llave principal
 tamBloque = 4       # Tamaño de los bloques en bytes (tamaño final len, tamBloque*8)
 tamMensaje = 10     # Tamaño del mensaje en bytes
-tamLlave = 4        # Tamaño de las subllaves en bytes
+tamLlave = 3        # Tamaño de las subllaves en bytes
 
 x = ''              # Lista vacia para almacenar mensaje en binario
 
@@ -76,14 +76,18 @@ for linea in f:
         x = x + binario
 
 listaBloq = []      # Se dividen los bloques a encriptar (Almacena)
+print("Mensaje original \n" + x)
 i = 0
+
+# Para decodificar copiar el mensaje codificado en la linea de abajo y descomentar
+# x = "00000010001101010110100001101101010101111110101101101110011011100101011100001111"
+print("Mensaje a decodificar \n" + x)
 
 while i * tamBloque * 8 < len(x):
     listaBloq.append(x[tamBloque * i * 8:tamBloque * 8 * (i + 1)])
     i += 1
 
 subllaves = generarsubllaves(llave, tamLlave, len(listaBloq))
-tipo = 1                            # 0 para codificar / 1 para decodificar
 
 final = ''
 i=0
@@ -95,16 +99,10 @@ for bloque in listaBloq:
     R0 = bloque[mitad:n]
 
     while rondas > 0:
-        if tipo == 0:
-            R0Aux = funcion(subllaves[i], R0)
-            R1 = xor(R0Aux, L0)
-            L0 = R0
-            R0 = R1
-        else:
-            R0Aux = funcion(subllaves[len(subllaves)-i-1], R0)
-            R1 = xor(R0Aux, L0)
-            L0 = R0
-            R0 = R1
+        R0Aux = funcion(subllaves[i], R0)
+        R1 = xor(R0Aux, L0)
+        L0 = R0
+        R0 = R1
 
         rondas = rondas - 1
 
@@ -115,8 +113,7 @@ for bloque in listaBloq:
 
     i = i+1
 
-print(final)        #Mensaje final en binario
-
+print("Mensaje a decodificado \n" + final)
 
 
 
