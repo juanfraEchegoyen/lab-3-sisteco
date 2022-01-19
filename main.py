@@ -1,6 +1,4 @@
-import binascii
 import hashlib
-import os
 from pathlib import Path
 
 Path(r'C:\Users\nico4\Downloads\Universidad\Sistemas De Comunicación\Laboratorio\Lab 3\Codigo\txt.txt').stat()
@@ -15,6 +13,7 @@ f = f.readlines()
 def xor(a, b):
     i = 0
     codigo = ''
+
     while i < len(a):
         if a[i] == b[i]:
             codigo = codigo + '0'
@@ -24,11 +23,9 @@ def xor(a, b):
 
     return codigo
 
-
+# Se generan sus llaves usando hash,
 def generarsubllaves(llave, tamaño, cantidad):
-
     llaves = []
-
     hash = hashlib.blake2b(digest_size=tamaño)
     hash.update(llave.encode())
     subllave = hash.digest()
@@ -43,21 +40,22 @@ def generarsubllaves(llave, tamaño, cantidad):
 
     return llaves
 
-
+# Funcion que transforma tanto el bloque ingresado como la subllave en valores numericos
+# se suman y el resultado de la suma se tranforma a binario para obtener el bloque de salida
 def funcion(subLlave, bloque):
-    resultado = int(bloque, 2)
+    resultado = int(bloque, 2)                          # Se pasa el bloque a su valor numerico
 
-    for bytes in subLlave:
+    for bytes in subLlave:                              # Se suman los valores de cada byte de la llave
         resultado = resultado + bytes
 
-    lenbloque = len(bloque)
+    lenbloque = len(bloque)                             # Se obtiene el largo original del bloque
 
-    while resultado > pow(2, len(bloque)):
-        resultado = resultado - pow(2, len(bloque))
-
+    while resultado > pow(2, len(bloque)):              # Si el resultado obtenido es mayor 2 elevado al tamaño del
+        resultado = resultado - pow(2, len(bloque))     # Se resta para que su numero binario no posea mas bit
+                                                        # De los necesarios
     resultado = format(resultado, "b")
 
-    while len(resultado) < len(bloque):
+    while len(resultado) < len(bloque):                 # Si les faltaran bit al resultado se rellenan con 0
         resultado = '0' + resultado
 
     return resultado
@@ -66,7 +64,7 @@ def funcion(subLlave, bloque):
 llave = "hola"      # Llave principal
 tamBloque = 4       # Tamaño de los bloques en bytes (tamaño final len, tamBloque*8)
 tamMensaje = 10     # Tamaño del mensaje en bytes
-tamLlave = 4       # Tamaño de las subllaves
+tamLlave = 4        # Tamaño de las subllaves en bytes
 
 x = ''              # Lista vacia para almacenar mensaje en binario
 
@@ -76,9 +74,7 @@ for linea in f:
     for letra in linBin:
         binario = format(letra, '08b')
         x = x + binario
-#   '01101000011011110110110001100001001000000110110101110101011011100110010001101111'
-x = '01101110011100010110101100001111011011010110111000101000011011010110111110100100'
-print(x)
+
 listaBloq = []      # Se dividen los bloques a encriptar (Almacena)
 i = 0
 
@@ -87,12 +83,12 @@ while i * tamBloque * 8 < len(x):
     i += 1
 
 subllaves = generarsubllaves(llave, tamLlave, len(listaBloq))
-tipo = 1
+tipo = 1                            # 0 para codificar / 1 para decodificar
 
 final = ''
 i=0
 for bloque in listaBloq:
-    rondas = 12
+    rondas = 16
     n = len(bloque)
     mitad = int(n / 2)
     L0 = bloque[0:mitad]
@@ -119,17 +115,14 @@ for bloque in listaBloq:
 
     i = i+1
 
-print(final)
+print(final)        #Mensaje final en binario
 
 
-sin = '01101000011011110110110001100001001000000110110101110101011011100110010001101111'
-con = '01101110011100010110101100001111011011010110111000101000011011010110111110100100'
 
-if sin == final:
-    print("decodificado bien")
 
-if con == final:
-    print("codificado bien")
+
+
+
 
 
 
